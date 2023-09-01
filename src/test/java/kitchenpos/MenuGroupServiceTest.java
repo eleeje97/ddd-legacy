@@ -38,13 +38,11 @@ public class MenuGroupServiceTest {
     @Test
     void 메뉴그룹을_생성한다() {
         // given
-        MenuGroup request = new MenuGroup();
-        request.setName(DOUBLE_SET);
-
-        given(menuGroupRepository.save(any())).willReturn(createMenuGroup(DOUBLE_SET));
+        MenuGroup menuGroup = createMenuGroup(DOUBLE_SET);
+        given(menuGroupRepository.save(any())).willReturn(menuGroup);
 
         // when
-        MenuGroup actual = menuGroupService.create(request);
+        MenuGroup actual = menuGroupService.create(menuGroup);
 
         // then
         assertThat(actual.getId()).isNotNull();
@@ -55,26 +53,22 @@ public class MenuGroupServiceTest {
     @ValueSource(strings = {""})
     void 메뉴그룹이름이_빈값이면_예외가_발생한다(String menuGroupName) {
         // given
-        MenuGroup request = new MenuGroup();
-        request.setName(menuGroupName);
+        MenuGroup menuGroup = createMenuGroup(menuGroupName);
 
         // when, then
-        assertThatThrownBy(() -> menuGroupService.create(request))
+        assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 메뉴그룹을_조회한다() {
         // given
-        MenuGroup request1 = new MenuGroup();
-        request1.setName(DOUBLE_SET);
-        menuGroupService.create(request1);
+        MenuGroup menuGroup1 = createMenuGroup(DOUBLE_SET);
+        MenuGroup menuGroup2 = createMenuGroup(TRIPLE_SET);
+        menuGroupService.create(menuGroup1);
+        menuGroupService.create(menuGroup2);
 
-        MenuGroup request2 = new MenuGroup();
-        request2.setName(TRIPLE_SET);
-        menuGroupService.create(request2);
-
-        given(menuGroupRepository.findAll()).willReturn(List.of(createMenuGroup(DOUBLE_SET), createMenuGroup(TRIPLE_SET)));
+        given(menuGroupRepository.findAll()).willReturn(List.of(menuGroup1, menuGroup2));
 
         // when
         List<MenuGroup> menuGroupList = menuGroupService.findAll();
